@@ -1,3 +1,7 @@
+var yellowstoneLatitude = 44.4123;
+var yellowstoneLongitude = 110.7232;
+var volcanoImg;
+
 var mapImg;
 
 var centerLatitude = 0;
@@ -9,9 +13,13 @@ var longitude = -123.1207;
 var zoom = 1;
 var earthquakes;
 
+var circleSize = 1500;
+
+
 function preload() {
   mapImg = loadImage("https://api.mapbox.com/styles/v1/mapbox/dark-v9/static/0,0,1/1024x512?access_token=pk.eyJ1IjoibXJkYW11cyIsImEiOiJjamdwMTFpbXAwZmF4MzNvMnJueWhvazVkIn0.HaAUa8rcmLQkH69ICwqPDg");
-  earthquakes = loadStrings('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.csv');
+  earthquakes = loadStrings('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.csv');
+  volcanoImg = loadImage('volcano.png');
 }
 
 function setup () {
@@ -20,6 +28,20 @@ function setup () {
   imageMode(CENTER);
   image(mapImg, 0, 0);
 
+
+
+
+  // image(volcanoImg, yellowstoneLatitude, yellowstoneLongitude, 50, 50)
+  image(volcanoImg, -318, -148, 20, 20);
+
+  refreshButton = createButton('Refresh data');
+  refreshButton.position(8, 499);
+  refreshButton.mousePressed(refreshData);
+
+  function refreshData(){
+    
+  }
+
   var cx = mercX(centerLongitude);
   var cy = mercY(centerLatitude);
 
@@ -27,29 +49,27 @@ function setup () {
   // var y = mercY(latitude) - cy;
 
 
-
   for (var i = 0; i < earthquakes.length; i++) {
+    var x = mercX(longitude) - cx;
+    var y = mercY(latitude) - cy;
     var data = earthquakes[i].split(/,/);
     //console.log(data);
     var latitude = data[1];
     var longitude = data[2];
-    var x = mercX(longitude) - cx;
-    var y = mercY(latitude) - cy;
-
     var mag = data[4];
-    mag = pow(10, mag);
-    mag = sqrt(mag);
+
+    // mag = pow(10, mag);
+    // mag = sqrt(mag);
+    mag = pow( 10, mag / 2 );
     var magMax = sqrt(pow(10,10));
 
-    var circleSize = 1000;
-
-    var d = map(mag, 0, magMax, 0, circleSize);
+    var pointSize = map(mag, 0, magMax, 0, circleSize);
 
     fill(255, 0, 255, 200);
     stroke(100, 100);
-    ellipse(x, y, d , d);
+    ellipse(x, y, pointSize , pointSize);
   }
-
+  
 }
 
 function mercX(lon) {
@@ -65,4 +85,8 @@ function mercY(lat) {
   var b = tan(PI / 4 + latitude / 2);
   var c = PI - log(b);
   return a * c;
+}
+
+function draw(){
+
 }
